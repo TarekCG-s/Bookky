@@ -1,0 +1,24 @@
+CREATE TABLE users
+(
+  id SERIAL PRIMARY KEY,
+  username VARCHAR NOT NULL UNIQUE,
+  email VARCHAR NOT NULL UNIQUE,
+  password VARCHAR NOT NULL,
+  image VARCHAR
+);
+
+CREATE TABLE posts (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR NOT NULL,
+  content TEXT NOT NULL,
+  author INTEGER REFERENCES users,
+  date_posted TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE books (
+  id SERIAL PRIMARY Key,
+  isbn VARCHAR NOT NULL UNIQUE,
+  title VARCHAR NOT NULL,
+  author VARCHAR,
+  year INTEGER
+);
