@@ -24,9 +24,12 @@
           <div class="navbar-nav mr-auto">
             <a class="nav-item nav-link" href="/">Home</a>
             {% if session['username'] %}
-              <a class="nav-item nav-link" href="/profile">Profile</a>
+              <a class="nav-item nav-link" href="/account/">Account</a>
             {% endif %}
-
+            <form class="form-inline" action="{{url_for('search')}}" method="POST">
+              <input class="form-control mr-sm-2" type="text" name="book" placeholder="Search">
+              <button class="btn btn-info" type="submit" >Search</button>
+            </form>
 
           </div>
 

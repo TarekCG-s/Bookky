@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>{{ results_count }} Search Results were found</h1> <br>
+<ul>
+  {% for book in books %}
+  <li style="list-style-type:none;"> <h5> <a href="{{ url_for('book', isbn=book.isbn) }}">{{ book.title }} - {{ book.author }} - {{ book.year }} - {{ book.isbn }}</a></h5></li>
+  {% endfor %}
+</ul>
+{% endblock %}

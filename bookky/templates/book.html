@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Book Info - {{ book.title }}</h1>
+<img src="http://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg" alt="">
+<h3>Book Author: {{book.author}}</h3>
+<h5>review counts is {{book.review_count}}</h5>
+<h5>Average Rating is {{book.average_score}}</h5>
+<h5>Goodreads reviews count is {{ goodreads_result.books[0].work_reviews_count }}</h5>
+<h5>Goodreads Average Rating is {{ goodreads_result.books[0].average_rating }}</h5>
+{% endblock %}

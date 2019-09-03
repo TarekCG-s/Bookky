@@ -7,18 +7,21 @@ CREATE TABLE users
   image VARCHAR
 );
 
-CREATE TABLE posts (
+CREATE TABLE reviews (
   id SERIAL PRIMARY KEY,
   title VARCHAR NOT NULL,
   content TEXT NOT NULL,
   author INTEGER REFERENCES users,
+  book INTEGER REFERENCES books,
   date_posted TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE books (
-  id SERIAL PRIMARY Key,
+  id SERIAL PRIMARY KEY,
   isbn VARCHAR NOT NULL UNIQUE,
   title VARCHAR NOT NULL,
   author VARCHAR,
-  year INTEGER
+  year INTEGER,
+  review_count INTEGER NOT NULL DEFAULT 0,
+  average_score FLOAT NOT NULL DEFAULT 0.0
 );

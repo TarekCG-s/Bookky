@@ -26,14 +26,6 @@ posts = [
             "But it is always there whether we see it or not, whether we choose to or not." + "The truth doesn’t care about our needs or wants - it doesn’t care about our governments, " +
             "our ideologies, our religions - to lie in wait for all time.",
         "date": "23 Aug 2019"
-    },
-    {
-        "author":"Sarah",
-        "title":"I hate you and I love you",
-        "content": "TDiscovering old songs is my new hobby - I've found a lot of hidden treasures and amazing voices in the last 4 months." +
-            "I felt soo happy when I listened to Strangers in the night by Frank Sinatra." +
-             "I felt like: Ok I've found my favorite song. But no, I was wrong! This song is my new addiction and my favorite song ever!!! Their voices areeee magical!!",
-        "date": "17 Feb 2018 "
     }
 ]
 from bookky import routes
