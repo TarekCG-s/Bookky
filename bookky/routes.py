@@ -56,12 +56,15 @@ def login():
         return redirect(url_for('index'))
     return render_template('login.html',title="Login" , form=form)
 
+
+
 @app.route('/logout')
 @login_required
 def logout():
     session.pop('user_id', None)
     session.pop('username', None)
     return redirect(url_for('index'))
+
 
 
 @app.route('/search/', methods=['POST'])
@@ -72,12 +75,16 @@ def search():
         return render_template('error.html', error_message=error_message)
     return redirect(url_for('book_lookup', book=book))
 
+
+
 @app.route('/book_lookup/<string:book>', methods=['GET'])
 def book_lookup(book):
     book = f"%{book}%"
     books = db.execute("SELECT * FROM books WHERE title LIKE :book", {"book":book}).fetchall()
 
     return render_template('book_lookup.html',title=book , books=books, results_count=len(books))
+
+
 
 @app.route('/book/<string:isbn>', methods=["GET"])
 def book(isbn):
@@ -87,7 +94,26 @@ def book(isbn):
         error_message = "There's no such book"
         return render_template('error.html', error_message=error_message)
 
+    reviews = db.execute("SELECT * FROM reviews WHERE book = :book_id AND reviewer != :reviewer", {"book_id":book.id, "reviewer": session['user_id']}).fetchall()
+    user_review = db.execute("SELECT * FROM reviews WHERE book = :book_id AND reviewer = :reviewer", {"book_id":book.id, "reviewer": session['user_id']}).fetchone()
     api_key = 'pbv0u9wn9bHWm6v5NakhA'
     goodreads_result = requests.get('https://www.goodreads.com/book/review_counts.json', params={"key": api_key, "isbns":isbn})
     goodreads_result = goodreads_result.json()
-    return render_template("book.html", book=book, title=book.title, goodreads_result=goodreads_result)
+    return render_template("book.html", book=book, title=book.title, goodreads_result=goodreads_result, reviews=reviews, user_review=user_review)
+
+
+
+@app.route('/add_review/<string:id>/<string:isbn>', methods=["POST"])
+def add_review(id, isbn):
+    id = int(id)
+    rating = int(request.form.get('rating'))
+    review = request.form.get('review')
+    db.execute("INSERT INTO reviews (rating, review, reviewer, book) VALUES (:rating, :review, :reviewer, :book)", {"rating" : rating, "review" : review, "reviewer": session['user_id'], "book": id})
+    book = db.execute("SELECT * FROM books WHERE id=:id", {"id":id}).fetchone()
+    db.execute("UPDATE books SET review_count = :review_count, total_score = :total_score, average_score = :average_score", {
+    "review_count": book.review_count + 1,
+    "total_score": book.total_score + rating,
+    "average_score": (book.total_score + rating) / ( book.review_count + 1)
+    })
+    db.commit()
+    return redirect(url_for('book', isbn=isbn))

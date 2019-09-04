@@ -8,16 +8,7 @@ import csv
 engine = create_engine('postgresql://postgres:5161723@localhost:5432/postgres')
 db = scoped_session(sessionmaker(bind=engine))
 
-db.execute("""
-    CREATE TABLE users
-    (
-      id SERIAL PRIMARY KEY,
-      username VARCHAR NOT NULL UNIQUE,
-      email VARCHAR NOT NULL UNIQUE,
-      password VARCHAR NOT NULL,
-      image VARCHAR
-    )
-""")
+
 
 db.execute("""CREATE TABLE books (
   id SERIAL PRIMARY KEY,
@@ -26,19 +17,22 @@ db.execute("""CREATE TABLE books (
   author VARCHAR,
   year INTEGER,
   review_count INTEGER NOT NULL DEFAULT 0,
+  total_score INTEGER NOT NULL DEFAULT 0,
   average_score FLOAT NOT NULL DEFAULT 0.0
 )
 """)
 
 db.execute("""CREATE TABLE reviews (
   id SERIAL PRIMARY KEY,
-  title VARCHAR NOT NULL,
-  content TEXT NOT NULL,
-  author INTEGER REFERENCES users,
+  rating INTEGER NOT NULL,
+  review TEXT NOT NULL,
+  reviewer INTEGER REFERENCES users,
   book INTEGER REFERENCES books,
   date_posted TIMESTAMP DEFAULT NOW()
 )
 """)
+
+
 
 
 db.commit()

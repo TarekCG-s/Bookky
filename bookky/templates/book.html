@@ -4,7 +4,43 @@
 <img src="http://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg" alt="">
 <h3>Book Author: {{book.author}}</h3>
 <h5>review counts is {{book.review_count}}</h5>
-<h5>Average Rating is {{book.average_score}}</h5>
+{% if book.review_count != 0 %}
+  <h5>Average Rating is {{book.total_score / book.review_count}}</h5>
+{% else %}
+  <h5>Average Rating is 0</h5>
+{% endif %}
 <h5>Goodreads reviews count is {{ goodreads_result.books[0].work_reviews_count }}</h5>
 <h5>Goodreads Average Rating is {{ goodreads_result.books[0].average_rating }}</h5>
+
+
+{% if user_review is none %}
+  <form class="" action="{{ url_for('add_review',id=book.id, isbn=book.isbn) }}" method="post">
+    <select name="rating"> Rating
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+    <textarea name="review" rows="5" cols="50">
+
+    </textarea>
+    <button type="submit" name="submit">Post Review</button>
+  </form>
+{% else %}
+  <ul>
+    <li>USER_ID : {{user_review.reviewer}}</li>
+    <li>Rating : {{user_review.rating}}</li>
+    <li>Review : {{user_review.review}}</li>
+  </ul>
+{% endif %}
+
+{% for review in reviews %}
+  <ul>
+    <li>USER_ID : {{review.reviewer}}</li>
+    <li>Rating : {{review.rating}}</li>
+    <li>Review : {{review.review}}</li>
+  </ul>
+{% endfor %}
+
 {% endblock %}

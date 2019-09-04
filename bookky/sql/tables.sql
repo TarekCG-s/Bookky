@@ -9,9 +9,9 @@ CREATE TABLE users
 
 CREATE TABLE reviews (
   id SERIAL PRIMARY KEY,
-  title VARCHAR NOT NULL,
-  content TEXT NOT NULL,
-  author INTEGER REFERENCES users,
+  rating INTEGER NOT NULL,
+  review TEXT NOT NULL,
+  reviewer INTEGER REFERENCES users,
   book INTEGER REFERENCES books,
   date_posted TIMESTAMP DEFAULT NOW()
 );
@@ -23,5 +23,6 @@ CREATE TABLE books (
   author VARCHAR,
   year INTEGER,
   review_count INTEGER NOT NULL DEFAULT 0,
+  total_score INTEGER NOT NULL DEFAULT 0,
   average_score FLOAT NOT NULL DEFAULT 0.0
 );
