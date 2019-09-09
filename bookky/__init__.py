@@ -14,7 +14,7 @@ bcrypt = Bcrypt(app)
 
 
 
-engine = create_engine(os.getenv('DATABASE_URL'))
+engine = create_engine('postgres://hgsyswtktdvbwq:fe0088fdefc1052e4dc9a9bdb48c3d9a1a182d448974bc911065a64741c99039@ec2-174-129-27-3.compute-1.amazonaws.com:5432/d4jtj0nfnuhkg5')
 db = scoped_session(sessionmaker(bind=engine))
 
 

@@ -3,12 +3,20 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 import psycopg2
 import csv
+s
 
-
-engine = create_engine('postgresql://postgres:5161723@localhost:5432/postgres')
+engine = create_engine('postgres://hgsyswtktdvbwq:fe0088fdefc1052e4dc9a9bdb48c3d9a1a182d448974bc911065a64741c99039@ec2-174-129-27-3.compute-1.amazonaws.com:5432/d4jtj0nfnuhkg5')
 db = scoped_session(sessionmaker(bind=engine))
 
-
+db.execute("""CREATE TABLE users
+(
+  id SERIAL PRIMARY KEY,
+  username VARCHAR NOT NULL UNIQUE,
+  email VARCHAR NOT NULL UNIQUE,
+  password VARCHAR NOT NULL,
+  image VARCHAR
+)
+""")
 
 db.execute("""CREATE TABLE books (
   id SERIAL PRIMARY KEY,

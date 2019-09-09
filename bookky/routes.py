@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, render_template, url_for, flash, redirect, session, request
+from flask import Flask, render_template, url_for, flash, redirect, session, request, jsonify
 from bookky import app, db, bcrypt, posts
 from bookky.wrappers import login_required, logout_required
 from bookky.forms import RegistrationForm, LoginForm
@@ -88,22 +88,31 @@ def book_lookup(book):
 
 @app.route('/book/<string:isbn>', methods=["GET"])
 def book(isbn):
-
+    user_review = None
     book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn":isbn}).fetchone()
     if book is None:
         error_message = "There's no such book"
         return render_template('error.html', error_message=error_message)
 
-    reviews = db.execute("SELECT * FROM reviews WHERE book = :book_id AND reviewer != :reviewer", {"book_id":book.id, "reviewer": session['user_id']}).fetchall()
-    user_review = db.execute("SELECT * FROM reviews WHERE book = :book_id AND reviewer = :reviewer", {"book_id":book.id, "reviewer": session['user_id']}).fetchone()
     api_key = 'pbv0u9wn9bHWm6v5NakhA'
     goodreads_result = requests.get('https://www.goodreads.com/book/review_counts.json', params={"key": api_key, "isbns":isbn})
     goodreads_result = goodreads_result.json()
+
+    if session.get('user_id') != None:
+        reviews = db.execute("SELECT * FROM reviews WHERE book = :book_id AND reviewer != :reviewer", {"book_id":book.id, "reviewer": session['user_id']}).fetchall()
+        user_review = db.execute("SELECT * FROM reviews WHERE book = :book_id AND reviewer = :reviewer", {"book_id":book.id, "reviewer": session['user_id']}).fetchone()
+        return render_template("book.html", book=book, title=book.title, goodreads_result=goodreads_result, reviews=reviews, user_review=user_review)
+
+
+    reviews = db.execute("SELECT * FROM reviews WHERE book = :book_id", {"book_id":book.id}).fetchall()
     return render_template("book.html", book=book, title=book.title, goodreads_result=goodreads_result, reviews=reviews, user_review=user_review)
 
 
 
+
+
 @app.route('/add_review/<string:id>/<string:isbn>', methods=["POST"])
+@login_required
 def add_review(id, isbn):
     id = int(id)
     rating = int(request.form.get('rating'))
@@ -117,3 +126,21 @@ def add_review(id, isbn):
     })
     db.commit()
     return redirect(url_for('book', isbn=isbn))
+
+
+@app.route('/api/book/<string:isbn>')
+def api_book(isbn):
+    book = db.execute("SELECT * FROM books WHERE isbn=:isbn", {"isbn":isbn}).fetchone()
+    if book == None:
+        return jsonify({"Error":"There's no book with such ISBN"}), 422
+
+    book_json = jsonify({
+        "title":book.title,
+        "author": book.author,
+        "year": book.year,
+        "isbn": book.isbn,
+        "review_count": book.review_count,
+        "average_score": book.average_score
+    })
+
+    return book_json
