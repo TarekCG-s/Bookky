@@ -8,7 +8,7 @@ from bookky.forms import RegistrationForm, LoginForm
 @app.route('/home')
 @login_required
 def index():
-    books = db.execute("SELECT * FROM books ORDER BY review_count DESC LIMIT 10").fetchall()
+    books = db.execute("SELECT * FROM books ORDER BY review_count DESC LIMIT 12").fetchall()
     return render_template('index.html', books = books)
 
 
