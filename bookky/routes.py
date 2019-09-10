@@ -8,7 +8,8 @@ from bookky.forms import RegistrationForm, LoginForm
 @app.route('/home')
 @login_required
 def index():
-    return render_template('index.html', posts = posts)
+    books = db.execute("SELECT * FROM books ORDER BY review_count DESC LIMIT 10").fetchall()
+    return render_template('index.html', books = books)
 
 
 
@@ -98,12 +99,12 @@ def book(isbn):
     goodreads_result = goodreads_result.json()
 
     if session.get('user_id') != None:
-        reviews = db.execute("SELECT * FROM reviews WHERE book = :book_id AND reviewer != :reviewer", {"book_id":book.id, "reviewer": session['user_id']}).fetchall()
-        user_review = db.execute("SELECT * FROM reviews WHERE book = :book_id AND reviewer = :reviewer", {"book_id":book.id, "reviewer": session['user_id']}).fetchone()
+        reviews = db.execute("SELECT * FROM reviews JOIN users ON users.id= reviews.reviewer WHERE book = :book_id AND reviewer != :reviewer", {"book_id":book.id, "reviewer": session['user_id']}).fetchall()
+        user_review = db.execute("SELECT * FROM reviews JOIN users ON users.id= reviews.reviewer WHERE book = :book_id AND reviewer = :reviewer", {"book_id":book.id, "reviewer": session['user_id']}).fetchone()
         return render_template("book.html", book=book, title=book.title, goodreads_result=goodreads_result, reviews=reviews, user_review=user_review)
 
 
-    reviews = db.execute("SELECT * FROM reviews WHERE book = :book_id", {"book_id":book.id}).fetchall()
+    reviews = db.execute("SELECT * FROM reviews JOIN users ON users.id= reviews.reviewer WHERE book = :book_id", {"book_id":book.id}).fetchall()
     return render_template("book.html", book=book, title=book.title, goodreads_result=goodreads_result, reviews=reviews, user_review=user_review)
 
 
@@ -118,10 +119,11 @@ def add_review(id, isbn):
     review = request.form.get('review')
     db.execute("INSERT INTO reviews (rating, review, reviewer, book) VALUES (:rating, :review, :reviewer, :book)", {"rating" : rating, "review" : review, "reviewer": session['user_id'], "book": id})
     book = db.execute("SELECT * FROM books WHERE id=:id", {"id":id}).fetchone()
-    db.execute("UPDATE books SET review_count = :review_count, total_score = :total_score, average_score = :average_score", {
+    db.execute("UPDATE books SET review_count = :review_count, total_score = :total_score, average_score = :average_score WHERE id=:id", {
     "review_count": book.review_count + 1,
     "total_score": book.total_score + rating,
-    "average_score": (book.total_score + rating) / ( book.review_count + 1)
+    "average_score": (book.total_score + rating) / ( book.review_count + 1),
+    "id":id
     })
     db.commit()
     return redirect(url_for('book', isbn=isbn))

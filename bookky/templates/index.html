@@ -1,14 +1,19 @@
 {% extends "pages-layout.html" %}
 {% block page_content %}
   <h1 class="heading">Dashboard</h1>
-    {% for post in posts %}
-      <div class="card">
-        <div class="card-header"><h5> {{post.author}} - {{post.date}}</h5> </div>
+  <div class="row">
+    {% for book in books %}
+    <div class="col">
+      <div class="card" style="width: 15rem;">
+        <img class="card-img-top" src="http://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg" alt="Card image cap">
         <div class="card-body">
-          <h5 class="card-title">{{post.title}}</h5>
-          <p class="card-text">{{post.content}}</p>
+          <h5 class="card-title"><a href="{{url_for('book',isbn=book.isbn)}}">{{ book.title }}</a></h5>
+          <p class="card-text">Author: {{book.author}} <br> Year Published: {{book.year}}</p>
         </div>
       </div>
+    </div>
     {% endfor %}
+  </div>
+
 
 {% endblock %}
