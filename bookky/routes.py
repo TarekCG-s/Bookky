@@ -80,8 +80,7 @@ def search():
 @app.route('/book_lookup/<string:book>', methods=['GET'])
 def book_lookup(book):
     book = f"%{book}%"
-    books = db.execute("SELECT * FROM books WHERE title LIKE :book", {"book":book}).fetchall()
-
+    books = db.execute("SELECT * FROM books WHERE title LIKE :book OR author LIKE :book OR isbn LIKE :book", {"book":book}).fetchall()
     return render_template('book_lookup.html',title=book , books=books, results_count=len(books))
 
 

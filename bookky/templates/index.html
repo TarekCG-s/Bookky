@@ -1,13 +1,14 @@
-{% extends "layout.html" %}
-{% block content %}
-<h1 class="heading">Home page</h1>
-  {% for post in posts %}
-    <div class="card">
-      <div class="card-header"><h5> {{post.author}} - {{post.date}}</h5> </div>
-      <div class="card-body">
-        <h5 class="card-title">{{post.title}}</h5>
-        <p class="card-text">{{post.content}}</p>
+{% extends "pages-layout.html" %}
+{% block page_content %}
+  <h1 class="heading">Dashboard</h1>
+    {% for post in posts %}
+      <div class="card">
+        <div class="card-header"><h5> {{post.author}} - {{post.date}}</h5> </div>
+        <div class="card-body">
+          <h5 class="card-title">{{post.title}}</h5>
+          <p class="card-text">{{post.content}}</p>
+        </div>
       </div>
-    </div>
-  {% endfor %}
+    {% endfor %}
+
 {% endblock %}
