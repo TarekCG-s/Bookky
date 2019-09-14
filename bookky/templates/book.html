@@ -69,7 +69,8 @@
 
 {% for review in reviews %}
 <div class="card">
-  <div class="card-header"><h5> {{review.username}} - {{review.date_posted}}</h5> </div>
+  <div class="card-header"><h5><img src="{{url_for('static', filename='profile_pics/' + user_review.image)}}" class="mr-3" style="width:64px;">
+     {{user_review.username}} </h5> </div>
   <div class="card-body">
     <h5 class="card-title">{{review.rating}} Out Of 5.0 </h5>
     <p class="card-text">{{review.review}}</p>
