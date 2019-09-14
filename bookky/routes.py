@@ -66,10 +66,6 @@ def confirm_account(token):
         flash('Your secret key is either invalid or has expired', 'warning')
         return redirect(url_for('login'))
 
-    existing_email = db.execute("SELECT * FROM users WHERE email=email", {"email":user['email']}).fetchone()
-    if existing_email:
-        flash('This Account has already been confirmed', 'warning')
-        return redirect(url_for('index'))
 
     db.execute("INSERT INTO users (username, email, password, image) VALUES (:username, :email, :password, :image)", {
     "username": user['username'], "email": user['email'], "password": user['password'], "image": 'default.jpg' })
