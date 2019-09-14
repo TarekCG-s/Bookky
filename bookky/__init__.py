@@ -4,28 +4,27 @@ from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from flask_bcrypt import Bcrypt
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flask_mail import Mail
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'd99ba4661b8599b8f4f139df838c9d8d'
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config["MAIL_SERVER"] = 'smtp.gmail.com'
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = "BookkyWebsite@gmail.com"
+app.config["MAIL_PASSWORD"] = "bookkyheroku"
+
 Session(app)
 bcrypt = Bcrypt(app)
+mail = Mail(app)
 
+serializer = Serializer(app.config['SECRET_KEY'], 1800)
 
 
 engine = create_engine('postgres://hgsyswtktdvbwq:fe0088fdefc1052e4dc9a9bdb48c3d9a1a182d448974bc911065a64741c99039@ec2-174-129-27-3.compute-1.amazonaws.com:5432/d4jtj0nfnuhkg5')
 db = scoped_session(sessionmaker(bind=engine))
 
-
-posts = [
-    {
-        "author":"Tarek",
-        "title":"chernobyl",
-        "content": "To be a scientist is to be naive. We are so focused on our search for truth, we fail to consider how few actually want us to find it." +
-            "But it is always there whether we see it or not, whether we choose to or not." + "The truth doesn’t care about our needs or wants - it doesn’t care about our governments, " +
-            "our ideologies, our religions - to lie in wait for all time.",
-        "date": "23 Aug 2019"
-    }
-]
 from bookky import routes

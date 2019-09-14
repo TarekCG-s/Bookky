@@ -1,8 +1,10 @@
 import requests
+import os
 from flask import Flask, render_template, url_for, flash, redirect, session, request, jsonify
-from bookky import app, db, bcrypt, posts
-from bookky.wrappers import login_required, logout_required
-from bookky.forms import RegistrationForm, LoginForm
+from bookky import app, db, bcrypt, serializer
+from bookky.helpers import login_required, logout_required, update_picture, send_email
+from bookky.forms import RegistrationForm, LoginForm, UpdatePicture, ResetRequestForm, ResetPasswordForm
+
 
 @app.route('/')
 @app.route('/home')
@@ -13,10 +15,20 @@ def index():
 
 
 
-@app.route('/account/')
+@app.route('/account/', methods=['GET', 'POST'])
 @login_required
 def account():
-    return render_template('account.html', title="Account")
+    user = db.execute("SELECT username, email, image FROM users WHERE id=:id", {"id":session['user_id']}).fetchone()
+    form = UpdatePicture()
+    print('test')
+    if form.validate_on_submit():
+        profile_pic = update_picture(form.profile_picture.data, session['user_id'])
+        print(profile_pic)
+        db.execute("UPDATE users SET image = :image WHERE id=:id", {"image": profile_pic, "id":session['user_id']})
+        db.commit()
+        return redirect(url_for('account'))
+    profile_picture = url_for('static', filename='profile_pics/' + user.image)
+    return render_template('account.html', title="Account", user=user, profile_picture=profile_picture, form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -32,13 +44,39 @@ def register():
             return redirect(url_for('register'))
 
         hash_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        db.execute("INSERT INTO users (username, email, password, image) VALUES (:username, :email, :password, :image)", {
-        "username": form.username.data, "email": form.email.data, "password": hash_pw, "image": 'default.jpg' })
-        db.commit()
-        flash(f'Hello, {form.username.data}. Thank you for making an account', 'success')
+        token = serializer.dumps({"username":form.username.data, "email":form.email.data, "password":hash_pw}).decode('utf-8')
+        msgBody = f'''
+        Confirm Account Link:
+        {url_for('confirm_account', token=token, _external=True)}
+        '''
+        send_email(form.email.data, 'Account Confirmation' ,msgBody)
+        flash(f'Hello, {form.username.data}. Thank you for registering. We have sent you a confirmation E-mail', 'warning')
         return redirect(url_for('login'))
 
     return render_template('register.html', title="Login", form=form)
+
+
+@app.route('/confirm_account/<token>')
+@logout_required
+def confirm_account(token):
+
+    try:
+        user = serializer.loads(token)
+    except:
+        flash('Your secret key is either invalid or has expired', 'warning')
+        return redirect(url_for('login'))
+
+    existing_email = db.execute("SELECT * FROM users WHERE email=email", {"email":user['email']}).fetchone()
+    if existing_email:
+        flash('This Account has already been confirmed', 'warning')
+        return redirect(url_for('index'))
+
+    db.execute("INSERT INTO users (username, email, password, image) VALUES (:username, :email, :password, :image)", {
+    "username": user['username'], "email": user['email'], "password": user['password'], "image": 'default.jpg' })
+    db.commit()
+    flash(f"Hello, {user['username']}. You have successfully confirmed your account.", 'success')
+
+    return redirect(url_for('login'))
 
 
 @app.route('/login',  methods=['GET', 'POST'])
@@ -129,6 +167,45 @@ def add_review(id, isbn):
     return redirect(url_for('book', isbn=isbn))
 
 
+@app.route('/reset_request', methods=['GET', 'Post'])
+@logout_required
+def reset_request():
+    form=ResetRequestForm()
+    if form.validate_on_submit():
+        user = db.execute("SELECT id, email FROM users WHERE email=:email",{'email':form.email.data}).fetchone()
+        if user != None:
+            token = serializer.dumps({'user_id':user.id}).decode('UTF-8')
+            msgBody = f'''
+            Password Reset Link
+            {url_for('reset_password', token=token, _external=True)}
+            '''
+            send_email(form.email.data, 'Password Reset', msgBody)
+            flash('An Email Reset Password has been sent to your E-mail', 'warning')
+            return redirect(url_for('login'))
+        flash("There's no such email registered", 'danger')
+    return render_template('reset_request.html', title='Reset Password Request', form=form)
+
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+@logout_required
+def reset_password(token):
+    form = ResetPasswordForm()
+    try:
+        user_id = serializer.loads(token)
+    except:
+        flash('Your secret key is either invalid or has expired', 'warning')
+        return redirect(url_for('login'))
+
+    if form.validate_on_submit():
+        hash_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        db.execute("UPDATE users SET password=:password WHERE id=:id",{"password":hash_pw, "id":user_id['user_id']})
+        db.commit()
+        flash("Your password has been reset successfully", 'success')
+        return redirect(url_for('login'))
+    return render_template('reset_password.html', title='Reset Password', form=form)
+
+
+
 @app.route('/api/book/<string:isbn>')
 def api_book(isbn):
     book = db.execute("SELECT * FROM books WHERE isbn=:isbn", {"isbn":isbn}).fetchone()
@@ -143,5 +220,4 @@ def api_book(isbn):
         "review_count": book.review_count,
         "average_score": book.average_score
     })
-
     return book_json

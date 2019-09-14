@@ -42,7 +42,7 @@
           {{ form.submit(class="btn btn-info btn-block") }}
         </div>
         <small class="text-muted ml-2">
-        <a href="#">forgot password?</a></small> <br> <br>
+        <a href="{{url_for('reset_request')}}">forgot password?</a></small> <br> <br>
         <small class="text-muted ml-2 border-top mb-4">Don't have an account? Click here to <a href="{{ url_for('register') }}">Sign Up</a></small>
       </div>
 

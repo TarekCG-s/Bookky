@@ -43,7 +43,8 @@
         </form>
       {% else %}
         <div class="card">
-          <div class="card-header"><h5> {{user_review.username}} - {{user_review.date_posted}}</h5> </div>
+          <div class="card-header"><h5><img src="{{url_for('static', filename='profile_pics/' + user_review.image)}}" class="mr-3" style="width:64px;">
+             {{user_review.username}} </h5></div>
           <div class="card-body">
             <h5 class="card-title">{{user_review.rating}} Out Of 5.0 </h5>
             <p class="card-text">{{user_review.review}}</p>
