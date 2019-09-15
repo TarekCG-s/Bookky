@@ -39,7 +39,7 @@ def register():
         if db.execute("SELECT username FROM users WHERE username=:username", {"username":form.username.data}).fetchone() :
             flash(f'{form.username.data} is already taken. Choose another name', 'danger')
             return redirect(url_for('register'))
-        elif db.execute("SELECT email FROM users WHERE email=:email", {"email" : form.email.data}).fetchone():
+        elif db.execute("SELECT email FROM users WHERE email=:email", {"email" : form.email.data.lower()}).fetchone():
             flash(f'{form.email.data} is already taken. Choose another E-Mail', 'danger')
             return redirect(url_for('register'))
 
@@ -68,7 +68,7 @@ def confirm_account(token):
 
 
     db.execute("INSERT INTO users (username, email, password, image) VALUES (:username, :email, :password, :image)", {
-    "username": user['username'], "email": user['email'], "password": user['password'], "image": 'default.jpg' })
+    "username": user['username'], "email": user['email'].lower(), "password": user['password'], "image": 'default.jpg' })
     db.commit()
     flash(f"Hello, {user['username']}. You have successfully confirmed your account.", 'success')
 
@@ -80,7 +80,7 @@ def confirm_account(token):
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = db.execute("SELECT username, id, password FROM users WHERE email=:email", {"email":form.email.data}).fetchone()
+        user = db.execute("SELECT username, id, password FROM users WHERE email=:email", {"email":form.email.data.lower()}).fetchone()
         if not user or not bcrypt.check_password_hash(user.password, form.password.data):
             flash(f'The E-mail or password is incorrect ','danger')
             return redirect(url_for('login'))
@@ -168,7 +168,7 @@ def add_review(id, isbn):
 def reset_request():
     form=ResetRequestForm()
     if form.validate_on_submit():
-        user = db.execute("SELECT id, email FROM users WHERE email=:email",{'email':form.email.data}).fetchone()
+        user = db.execute("SELECT id, email FROM users WHERE email=:email",{'email':form.email.data.lower()}).fetchone()
         if user != None:
             token = serializer.dumps({'user_id':user.id}).decode('UTF-8')
             msgBody = f'''

@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 import psycopg2
 import csv
-s
+
 
 engine = create_engine('postgres://hgsyswtktdvbwq:fe0088fdefc1052e4dc9a9bdb48c3d9a1a182d448974bc911065a64741c99039@ec2-174-129-27-3.compute-1.amazonaws.com:5432/d4jtj0nfnuhkg5')
 db = scoped_session(sessionmaker(bind=engine))
@@ -48,7 +48,7 @@ db.commit()
 file = open('books.csv')
 reader = csv.reader(file)
 for isbn, title, author, year in reader:
-    db.execute("INSERT INTO books (isbn, title, author, year) VALUES (:isbn, :title, :author, :year)", {"isbn": isbn, "title":title, "author":author, "year":int(year)})
+    db.execute("INSERT INTO books (isbn, title, author, year) VALUES (:isbn, :title, :author, :year)", {"isbn": isbn, "title":title.lower(), "author":author.lower(), "year":int(year)})
     print(f"ADDED {isbn}, {title}, {author}, {int(year)}")
 
 db.commit()

@@ -5,7 +5,7 @@
     {% for book in books %}
     <div class="col">
       <div class="card" style="width: 15rem;">
-        <img class="card-img-top" style="height:400px;;" src="http://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg" alt="Card image cap">
+        <a href="{{url_for('book',isbn=book.isbn)}}"><img class="card-img-top" style="height:400px;;" src="http://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg" alt="Card image cap"></a>
         <div class="card-body">
           <h5 class="card-title"><a href="{{url_for('book',isbn=book.isbn)}}">{{ book.title }}</a></h5>
           <p class="card-text">Author: {{book.author}} <br> Year Published: {{book.year}}</p>
