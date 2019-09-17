@@ -1,24 +1,42 @@
 {% extends "pages-layout.html" %}
 {% block page_content %}
 
-<div class="row justify-content-center">
-  <div class="col-8">
+<div class="row">
+  <div class="col-md-8">
     <br> <br>
     <div class="card">
       <div class="card-body">
-        <h2>{{ book.title }}</h2>
-        <h5>review counts is : {{book.review_count}}</h5>
+        <h1>{{ book.title }}</h1>
+        <h6>review counts is : {{book.review_count}}</h6>
         {% if book.review_count != 0 %}
-          <h5>Average Rating is {{book.total_score / book.review_count}}</h5>
+          <h6>Average Rating is {{book.total_score / book.review_count}}</h6>
         {% else %}
-          <h5>Average Rating is 0</h5>
+          <h6>Average Rating is 0</h6>
         {% endif %}
-        <h5>Goodreads reviews count is {{ goodreads_result.books[0].work_reviews_count }}</h5>
-        <h5>Goodreads Average Rating is {{ goodreads_result.books[0].average_rating }}</h5>
+        <h6>Goodreads reviews count is: {{ goodreads_result.books[0].work_reviews_count }}</h6>
+        <h6>Goodreads Average Rating is: {{ goodreads_result.books[0].average_rating }}</h6>
 
       </div>
     </div>
     <br> <br>
+
+
+  </div>
+
+  <div class="col-md">
+    <div class="card" style="width: 18rem;">
+      <img class="card-img-top" src="http://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg" alt="Card image cap">
+      <div class="card-body">
+        <h6 class="card-title">{{ book.title }}</h6>
+        <p class="card-text">Author: {{book.author}} <br> Year Published: {{book.year}} <br> isbn: {{book.isbn}}</p>
+      </div>
+    </div>
+  </div>
+</div> <br> <br>
+
+
+<div class="class="row"">
+  <div class="col-md-8">
     {% if session.get('user_id') is none %}
     <div class="card">
       <div class="card-body">
@@ -43,39 +61,29 @@
         </form>
       {% else %}
         <div class="card">
-          <div class="card-header"><h5><img src="{{url_for('static', filename='profile_pics/' + user_review.image)}}" class="mr-3" style="width:64px;">
-             {{user_review.username}} </h5></div>
+          <div class="card-header"><h6><img src="{{url_for('static', filename='profile_pics/' + user_review.image)}}" class="mr-3" style="width:64px;">
+             {{user_review.username}} </h6></div>
           <div class="card-body">
-            <h5 class="card-title">{{user_review.rating}} Out Of 5.0 </h5>
+            <h6 class="card-title">{{user_review.rating}} Out Of 5.0 </h6>
             <p class="card-text">{{user_review.review}}</p>
           </div>
         </div>
       {% endif %}
     {% endif %}
 
-
-  </div>
-
-  <div class="col">
-    <div class="card" style="width: 18rem;">
-      <img class="card-img-top" src="http://covers.openlibrary.org/b/isbn/{{book.isbn}}-M.jpg" alt="Card image cap">
+    {% for review in reviews %}
+    <div class="card">
+      <div class="card-header"><h6><img src="{{url_for('static', filename='profile_pics/' + review.image)}}" class="mr-3" style="width:64px;">
+         {{review.username}} </h6> </div>
       <div class="card-body">
-        <h5 class="card-title">{{ book.title }}</h5>
-        <p class="card-text">Author: {{book.author}} <br> Year Published: {{book.year}}</p>
+        <h6 class="card-title">{{review.rating}} Out Of 5.0 </h6>
+        <p class="card-text">{{review.review}}</p>
       </div>
     </div>
+    {% endfor %}
   </div>
 </div>
 
-{% for review in reviews %}
-<div class="card">
-  <div class="card-header"><h5><img src="{{url_for('static', filename='profile_pics/' + review.image)}}" class="mr-3" style="width:64px;">
-     {{review.username}} </h5> </div>
-  <div class="card-body">
-    <h5 class="card-title">{{review.rating}} Out Of 5.0 </h5>
-    <p class="card-text">{{review.review}}</p>
-  </div>
-</div>
-{% endfor %}
+
 
 {% endblock %}
