@@ -14,8 +14,8 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
-app.config["MAIL_USERNAME"] = "BookkyWebsite@gmail.com"
-app.config["MAIL_PASSWORD"] = "bookkyheroku"
+app.config["MAIL_USERNAME"] = os.environ.get('EMAIL_ADDRESS')
+app.config["MAIL_PASSWORD"] = os.environ.get('EMAIL_PASSWORD')
 
 Session(app)
 bcrypt = Bcrypt(app)
@@ -24,7 +24,7 @@ mail = Mail(app)
 serializer = Serializer(app.config['SECRET_KEY'], 1800)
 
 
-engine = create_engine('postgres://hgsyswtktdvbwq:fe0088fdefc1052e4dc9a9bdb48c3d9a1a182d448974bc911065a64741c99039@ec2-174-129-27-3.compute-1.amazonaws.com:5432/d4jtj0nfnuhkg5')
+engine = create_engine(os.getenv('DATABASE_URL'))
 db = scoped_session(sessionmaker(bind=engine))
 
 from bookky import routes
