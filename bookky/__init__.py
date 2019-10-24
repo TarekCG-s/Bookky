@@ -11,11 +11,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'd99ba4661b8599b8f4f139df838c9d8d'
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["MAIL_SERVER"] = 'smtp.sendgrid.net'
+app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
 app.config["MAIL_USE_SSL"] = False
-app.config["MAIL_USERNAME"] = 'BookkyWebsite@gmail.com'
+app.config["MAIL_USERNAME"] = 'bookkywebsite@gmail.com'
 app.config["MAIL_PASSWORD"] = 'bookkyheroku'
 
 Session(app)
