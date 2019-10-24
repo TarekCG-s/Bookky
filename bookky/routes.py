@@ -12,6 +12,7 @@ from bookky.forms import RegistrationForm, LoginForm, UpdatePicture, ResetReques
 @app.route('/home')
 @login_required
 def index():
+    # Select the most trending books based on the number of reviews count.
     books = db.execute("SELECT * FROM books ORDER BY review_count DESC LIMIT 12").fetchall()
     return render_template('index.html', books = books)
 
@@ -25,12 +26,13 @@ def index():
 @app.route('/account/', methods=['GET', 'POST'])
 @login_required
 def account():
+    # Select user's data
     user = db.execute("SELECT username, email, image FROM users WHERE id=:id", {"id":session['user_id']}).fetchone()
     form = UpdatePicture()
-    print('test')
     if form.validate_on_submit():
+        # resizing the uploaded photo and generating a random name for it.
         profile_pic = update_picture(form.profile_picture.data, session['user_id'])
-        print(profile_pic)
+        # storing the name of picture in the database in the row of the user.
         db.execute("UPDATE users SET image = :image WHERE id=:id", {"image": profile_pic, "id":session['user_id']})
         db.commit()
         return redirect(url_for('account'))
@@ -48,6 +50,7 @@ def account():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        username = form.username.data
         if db.execute("SELECT username FROM users WHERE username=:username", {"username":form.username.data}).fetchone() :
             flash(f'{form.username.data} is already taken. Choose another name', 'danger')
             return redirect(url_for('register'))
