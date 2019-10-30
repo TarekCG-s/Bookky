@@ -129,8 +129,6 @@ def logout():
 
 
 
-
-
 # **********************************************************************************************************************************
 # Reset password routes
 
@@ -184,7 +182,7 @@ def search():
     if book == "":
         error_message = "You should enter a name of what you're looking for"
         return render_template('error.html', error_message=error_message)
-    return redirect(url_for('book_lookup', book=book))
+    return redirect(url_for('book_lookup', book=book.lower()))
 
 
 
