@@ -8,10 +8,10 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask_mail_sendgrid import MailSendGrid
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'd99ba4661b8599b8f4f139df838c9d8d'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config['MAIL_SENDGRID_API_KEY'] ='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'
+app.config['MAIL_SENDGRID_API_KEY'] = os.getenv('SendGridAPI')
 
 Session(app)
 bcrypt = Bcrypt(app)
