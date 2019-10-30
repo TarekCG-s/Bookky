@@ -1,7 +1,7 @@
 # Bookky
-*
-Hosted on : http://bookky.herokuapp.com
-Demo video : https://youtu.be/KB8OOM2LMec
+
+* Hosted on : http://bookky.herokuapp.com
+* Demo video : https://youtu.be/KB8OOM2LMec
 
 # Overview :
 A book review website where users can register and login with their email and password.
