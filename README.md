@@ -10,7 +10,7 @@ They can post reviews and see other people's reviews and also see ratings of boo
 If a user forgot his password, he could request a link to change his password.
 
 # Specifications :
-The website was built with Python and Flask.
+The website was built with Python, Flask , Postgresql, HTML, CSS and Bootstrap 4.
 
 *run.py:*
   The file from where you can start the app.
